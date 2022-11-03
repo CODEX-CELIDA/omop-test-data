@@ -1,0 +1,12 @@
+{
+  "index-version": 1,
+  "files": [
+    {
+      "filename": "ImplementationGuide-celida-recommendations.json",
+      "resourceType": "ImplementationGuide",
+      "id": "celida-recommendations",
+      "url": "https://www.ceosys.de/fhir/ImplementationGuide/celida-recommendations",
+      "version": "1.0.0-snapshot"
+    }
+  ]
+}
