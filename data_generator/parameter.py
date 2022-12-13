@@ -45,10 +45,23 @@ OBSERVATION_LIST = {
 }
 
 LABORATORY_LIST = {
-    concepts.LAB_DDIMER: "Fibrin D-dimer DDU [Mass/volume] in Platelet poor plasma",
-    concepts.LAB_APTT: "aPTT in Blood by Coagulation assay",
-    concepts.LAB_HOROWITZ: "Horowitz index in Arterial blood",
+    concepts.LAB_DDIMER: {
+        "name": "Fibrin D-dimer DDU [Mass/volume] in Platelet poor plasma",
+        "unit": concepts.UNIT_UG_PER_L,
+        "sample_func": lambda: np.random.binomial(40, 0.45) / 10,
+    },
+    concepts.LAB_APTT: {
+        "name": "aPTT in Blood by Coagulation assay",
+        "unit": concepts.UNIT_SECOND,
+        "sample_func": lambda: np.random.normal(loc=50, scale=10),
+    },
+    concepts.LAB_HOROWITZ: {
+        "name": "Horowitz index in Arterial blood",
+        "unit": concepts.UNIT_MM_HG,
+        "sample_func": lambda: np.random.normal(loc=200, scale=50),
+    },
 }
+
 
 VENTILATION_LIST = {
     concepts.INHALED_OXYGEN_CONCENTRATION: "Inhaled oxygen concentration",

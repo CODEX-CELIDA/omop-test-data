@@ -1,8 +1,8 @@
 import datetime
 import random
-from typing import List, Optional
+from typing import List, Optional, cast
 
-import numpy as np
+pass
 
 from data_generator import parameter as params
 from omop import concepts
@@ -241,13 +241,9 @@ def create_lab_values_measurements(
     list_of_measurements = []
 
     # set different frequencies (x per day)
-    freq1 = 4  # used for higher-frequency generation of values
-    freq2 = 2  # used for less frequent generation
-    freq3 = 1  # once per day
-
-    unit_concept_id = (
-        0  # TODO: This is just a dummy value, to be replaced with the actual value
-    )
+    freq_high = 4  # used for higher-frequency generation of values
+    freq_low = 2  # used for less frequent generation
+    freq_daily = 1  # once per day
 
     # set "basetime" to visit_start, i.e. generation of lab values are started up to
     # twelve hours after the start of the visit
@@ -258,25 +254,19 @@ def create_lab_values_measurements(
 
     visit_duration = visit.visit_end_date - visit.visit_start_date
 
-    sample_func = {
-        concepts.LAB_HOROWITZ: lambda: np.random.normal(loc=200, scale=50),
-        concepts.LAB_APTT: lambda: np.random.normal(loc=50, scale=10),
-        concepts.LAB_DDIMER: lambda: np.random.binomial(40, 0.45) / 10,
-    }
-
     if visit.visit_concept_id == concepts.INTENSIVE_CARE:
         print("- patient is treated on ICU")
         freq = {
-            concepts.LAB_HOROWITZ: freq1,
-            concepts.LAB_APTT: freq3,
-            concepts.LAB_DDIMER: freq3,
+            concepts.LAB_HOROWITZ: freq_high,
+            concepts.LAB_APTT: freq_daily,
+            concepts.LAB_DDIMER: freq_daily,
         }
     elif visit.visit_concept_id == concepts.INPATIENT_VISIT:
         print("- patient is treated on normal ward")
         freq = {
-            concepts.LAB_HOROWITZ: freq2,
-            concepts.LAB_APTT: freq3,
-            concepts.LAB_DDIMER: freq3,
+            concepts.LAB_HOROWITZ: freq_low,
+            concepts.LAB_APTT: freq_daily,
+            concepts.LAB_DDIMER: freq_daily,
         }
     else:
         raise ValueError("visit_concept_id not recognized")
@@ -285,12 +275,15 @@ def create_lab_values_measurements(
         int(visit_duration.total_seconds() / SECONDS_PER_DAY)
     ):  # generate per day
         for parameter in list(params.LABORATORY_LIST):
-            for _ in range(freq[parameter]):  # with frequency 1
+            data = params.LABORATORY_LIST[parameter]
+            for _ in range(freq[parameter]):
                 measurement_date = measurement_datetime.date()
-                measurement_concept_id = parameter  # Horowitz Quotient/Index
+                measurement_concept_id = parameter
                 measurement_type_concept_id = concepts.EHR
                 # maybe here introduce if condition_concept_id ARDS/mechanical ventilation is given
-                value_as_number = sample_func[parameter]()  # type: ignore
+                value_as_number = data["sample_func"]()  # type: ignore
+                unit_concept_id = cast(int, data["unit"])
+
                 list_of_measurements.append(
                     Measurement(
                         person_id=person_id,
