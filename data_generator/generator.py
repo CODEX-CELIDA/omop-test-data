@@ -362,3 +362,59 @@ def create_prone_positioning_procedure(
             # print("back_duration:", back_duration)
 
     return list_of_procedures
+
+
+# Define condition_ids and weights for weighted random sampling. Taking multiple random samples without replacement requires np.random.choice
+cond_list = [37311061, 444247, 4009307, 432870, 440417, 4195694] 
+# COVID-19, Venous Thrombosis, Heparin-induced thrombocytopenia with thrombosis, Allergy to heparin, Allergy to heparinoid, Thrombocytopenic disorder, Pulmonary embolism, Acute respiratory distress syndrome
+cond_weights = [0.3, 0.1, 0.05, 0.15, 0.15, 0.25]
+
+# create conditions from list 'conditions' (default: x = up to four)
+def create_cond(person_id: int, visit: VisitOccurrence, x = 4):
+    person_id = person_id
+    r = random.choice(range(1, (x + 1)))
+    diagnoses = np.random.choice(cond_list, r, replace = False, p = cond_weights)
+    z = 0
+    for i in range(r):
+        condition_start_date = visit.visit_start_date
+        condition_start_datetime = datetime.datetime.combine(visit.visit_start_date, datetime.datetime.min.time())
+        condition_concept_id = diagnoses[z]
+        condition_end_date = condition_start_date
+        condition_end_datetime = condition_start_datetime
+        print("person_id:", person_id)
+        print("condition_concept_id:", condition_concept_id)
+        print("condition_start_date:", condition_start_date)
+        print("condition_start_datetime:", condition_start_datetime)
+        print("condition_end_date:", condition_end_date)
+        print("condition_end_datetime:", condition_end_datetime)
+        if z >= r:
+            break
+        z += 1
+
+# Define observation_concept_ids and weights for weighted random sampling. Taking multiple random samples without replacement requires np.random.choice
+obs_list = [4169185, 4170358] 
+# "Allergy to heparin"; "Allergy to heparinoid"
+obs_weights = [0.7, 0.3]
+
+
+# with probability y (default = 0.05), create entries concerning observation(s) from the list 'obs_list' (default: x = up to two)
+def create_obs(person_id, visit: VisitOccurrence, x = 2, y = 0.05):
+    ran = random.random()
+    if ran > 1 - y:
+        person_id = person_id
+        r = random.choice(range(1, (x + 1)))
+        observations = np.random.choice(obs_list, r, replace = False, p = obs_weights)
+        z = 0
+        for i in range(r):
+            observation_concept_id = observations[z]
+            observation_date = visit.visit_start_date
+            observation_datetime = datetime.datetime.combine(visit.visit_start_date, datetime.datetime.min.time())           
+            print("person_id:", person_id)
+            print("observation_concept_id:", observation_concept_id)
+            print("observation_date:", observation_date)
+            print("observation_datetime:", observation_datetime)
+            if z >= r:
+                break
+            z += 1
+    else:
+        pass
