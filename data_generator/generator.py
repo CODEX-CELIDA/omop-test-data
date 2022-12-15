@@ -431,23 +431,29 @@ def create_obs(
                 )
     return list_of_observations
 
-def create_weight(
-    person_id: int, person:Person, visit: VisitOccurrence
-):
-    data = params.LABORATORY_LIST[parameter]
-    list_of_measurements = []
-    measurement_concept_id = 4099154 # "Body weight"
-    measurement_date = visit.visit_start_date
-    if person.gender_concept_id == concepts.GENDER_MALE:
-        value_as_number = data["sample_func"]()
+# def create_weight(
+#     person_id: int, person:Person, visit: VisitOccurrence
+# ):
+#     if person.gender_concept_id == concepts.GENDER_MALE:
+#         for parameter in list(params.WEIGHT_LIST_MALE):
+#         data = params.WEIGHT_LIST_MALE[parameter]
+#         measurement_concept_id = parameter
+#         value_as_number = data["sample_func"]()
+
+
+#         list_of_measurements = []
+#         measurement_concept_id = 4099154 # "Body weight"
+#         measurement_date = visit.visit_start_date
+        
+#             value_as_number = data["sample_func"]()
 
     
-    list_of_measurements.append(
-                    Measurement(
-                        person_id=person_id,
-                        measurement_concept_id=measurement_concept_id,
-                        measurement_date=measurement_date,
-                        value_as_number=value_as_number,
-                        unit_concept_id=unit_concept_id,
-                    )
-                )
+#     list_of_measurements.append(
+#                     Measurement(
+#                         person_id=person_id,
+#                         measurement_concept_id=measurement_concept_id,
+#                         measurement_date=measurement_date,
+#                         value_as_number=value_as_number,
+#                         unit_concept_id=unit_concept_id,
+#                     )
+#                 )
