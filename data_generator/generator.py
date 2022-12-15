@@ -7,7 +7,8 @@ pass
 
 from data_generator import parameter as params
 from omop import concepts
-from omop.tables import DrugExposure, Measurement, ProcedureOccurrence, VisitOccurrence, ConditionOccurrence, Observation
+from omop.tables import DrugExposure, Measurement, ProcedureOccurrence, VisitOccurrence, ConditionOccurrence, Observation, Person
+
 
 SECONDS_PER_DAY = 86400
 
@@ -402,7 +403,7 @@ def create_cond(
 
 
 def create_obs(
-    person_id, visit: VisitOccurrence, max_occurrences: int = 2, probability_threshold: int = 0.05
+    person_id:int, visit: VisitOccurrence, max_occurrences: int = 2, probability_threshold: int = 0.05
     ) -> List[Observation]:
     """
     with a probability_threshold (default = 0.05), create entries concerning observation(s) from the list 'obs_list' (default: max_occurrences = up to two)
@@ -429,3 +430,24 @@ def create_obs(
                     )
                 )
     return list_of_observations
+
+def create_weight(
+    person_id: int, person:Person, visit: VisitOccurrence
+):
+    data = params.LABORATORY_LIST[parameter]
+    list_of_measurements = []
+    measurement_concept_id = 4099154 # "Body weight"
+    measurement_date = visit.visit_start_date
+    if person.gender_concept_id == concepts.GENDER_MALE:
+        value_as_number = data["sample_func"]()
+
+    
+    list_of_measurements.append(
+                    Measurement(
+                        person_id=person_id,
+                        measurement_concept_id=measurement_concept_id,
+                        measurement_date=measurement_date,
+                        value_as_number=value_as_number,
+                        unit_concept_id=unit_concept_id,
+                    )
+                )
