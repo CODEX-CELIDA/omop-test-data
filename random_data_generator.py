@@ -77,6 +77,8 @@ if __name__ == "__main__":
         create_prone_positioning_procedure,
         create_vent_params_measurements,
         create_vent_params_procedure,
+        create_cond,
+        create_obs
     )
     from omop.tables import Person, VisitOccurrence
 
@@ -118,7 +120,7 @@ if __name__ == "__main__":
         list_of_measurements += create_lab_values_measurements(person_id, visit)
         # print(list_of_measurements)
 
-        # create rest of procdures
+        # create rest of procedures
         list_of_procedures = []
         if prod is not None:
             list_of_procedures.append(prod)
@@ -126,7 +128,12 @@ if __name__ == "__main__":
         list_of_procedures += create_prone_positioning_procedure(
             person_id, visit, max_occurrences=5
         )
-        # print(list_of_procedures)
+
+        # create list of condition_occurences
+        list_of_conditions = create_cond(person_id, visit, max_occurrences=4)
+
+        # create list of observations
+        list_of_observations = create_obs(person_id, visit, max_occurrences=2, probability_threshold=0.5)
 
         # break
         ### INSERT
@@ -165,6 +172,16 @@ if __name__ == "__main__":
             "- Inserted measurement data with ", len(list_of_measurements), " entries"
         )
 
-        # TODO: condition_occurrence is missing
+        # insert list of conditions
+        for c in list_of_conditions:
+            insert("condition_occurrence", asdict(c))
+        con.commit()
+        print("- Inserted condition_occurrence data with ", len(list_of_conditions), " entries")
+
+        # insert list of observations
+        for o in list_of_observations:
+            insert("observation", asdict(o))
+        con.commit()
+        print("- Inserted observation data with ", len(list_of_observations), " entries")
 
     con.close()

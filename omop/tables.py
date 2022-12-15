@@ -138,3 +138,46 @@ class Measurement:
         Set measurement_type_concept_id to EHR
         """
         self.measurement_type_concept_id = concepts.EHR
+
+
+
+@dataclass
+class ConditionOccurrence:
+    """
+    ConditionOccurrence data class (OMOP CDM v5.4)
+    """
+
+    person_id: int
+    condition_concept_id: int
+    condition_concept_id: int
+    condition_start_date: datetime.date
+    condition_start_datetime: datetime.datetime
+    condition_end_date: datetime.date
+    condition_end_datetime: datetime.datetime
+    condition_type_concept_id: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        """
+        Set condition_type_concept_id to EHR
+        """
+        self.condition_type_concept_id = concepts.EHR
+
+
+
+@dataclass
+class Observation:
+    """
+    Observation data class (OMOP CDM v5.4)
+    """
+
+    person_id: int
+    observation_concept_id: int
+    observation_date: datetime.date
+    observation_datetime: datetime.datetime
+    observation_type_concept_id: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        """
+        Set observation_type_concept_id to EHR
+        """
+        self.observation_type_concept_id = concepts.EHR
