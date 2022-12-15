@@ -17,7 +17,6 @@ OBS_WEIGHTS : Final = [0.7, 0.3]
 
 
 
-
 def create_drug_exp2(
     person_id: int, visit: VisitOccurrence, n_administrations: int
 ) -> List[DrugExposure]:
@@ -431,29 +430,52 @@ def create_obs(
                 )
     return list_of_observations
 
-# def create_weight(
-#     person_id: int, person:Person, visit: VisitOccurrence
-# ):
-#     if person.gender_concept_id == concepts.GENDER_MALE:
-#         for parameter in list(params.WEIGHT_LIST_MALE):
-#         data = params.WEIGHT_LIST_MALE[parameter]
-#         measurement_concept_id = parameter
-#         value_as_number = data["sample_func"]()
 
+def create_weight_measurements(
+    person_id: int, person:Person, visit: VisitOccurrence
+) -> List[Measurement]:
+    """
+    Create Measurements for weight and ideal weight
 
-#         list_of_measurements = []
-#         measurement_concept_id = 4099154 # "Body weight"
-#         measurement_date = visit.visit_start_date
-        
-#             value_as_number = data["sample_func"]()
-
+    """
     
-#     list_of_measurements.append(
-#                     Measurement(
-#                         person_id=person_id,
-#                         measurement_concept_id=measurement_concept_id,
-#                         measurement_date=measurement_date,
-#                         value_as_number=value_as_number,
-#                         unit_concept_id=unit_concept_id,
-#                     )
-#                 )
+    list_of_measurements = []
+    
+    # Male
+    if person.gender_concept_id == concepts.GENDER_MALE:
+        for parameter in list(params.WEIGHT_LIST_MALE):
+            data = params.WEIGHT_LIST_MALE[parameter]
+            measurement_concept_id = parameter
+            measurement_date = visit.visit_start_date
+            value_as_number = data["sample_func"]()
+            unit_concept_id = data["unit"])
+
+            list_of_measurements.append(
+                Measurement(
+                    person_id=person_id,
+                    measurement_concept_id=measurement_concept_id,
+                    measurement_date=measurement_date,
+                    value_as_number=value_as_number,
+                    unit_concept_id=unit_concept_id,
+                )
+            )
+
+    # Female
+    elif person.gender_concept_id == concepts.GENDER_FEMALE:
+        for parameter in list(params.WEIGHT_LIST_FEMALE):
+            data = params.WEIGHT_LIST_FEMALE[parameter]
+            measurement_concept_id = parameter
+            measurement_date = visit.visit_start_date
+            value_as_number = data["sample_func"]()
+            unit_concept_id = data["unit"]
+            list_of_measurements.append(
+                Measurement(
+                    person_id=person_id,
+                    measurement_concept_id=measurement_concept_id,
+                    measurement_date=measurement_date,
+                    value_as_number=value_as_number,
+                    unit_concept_id=unit_concept_id,
+                )
+            )        
+
+    return list_of_measurements

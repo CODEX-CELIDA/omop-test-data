@@ -78,7 +78,8 @@ if __name__ == "__main__":
         create_vent_params_measurements,
         create_vent_params_procedure,
         create_cond,
-        create_obs
+        create_obs,
+        create_weight_measurements
     )
     from omop.tables import Person, VisitOccurrence
 
@@ -98,27 +99,21 @@ if __name__ == "__main__":
 
         # create person
         person = Person(person_id)
-        # print(person)
 
         # create visit
         visit = VisitOccurrence(person_id=person_id)
-        print(visit)
-        # print(visit)
 
         # create drugs
         list_of_drugs = create_drug_exp2(person_id, visit, n_administrations=10)
-        # print(list_of_drugs)
 
         # create first procedure
         prod = create_vent_params_procedure(person_id, visit)
-        # print(prod)
 
         # create measurements
         list_of_measurements = create_vent_params_measurements(
             person_id, prod, visit
         )  # REALLY USE THE FIRST PROD HERE??
         list_of_measurements += create_lab_values_measurements(person_id, visit)
-        # print(list_of_measurements)
 
         # create rest of procedures
         list_of_procedures = []
@@ -134,6 +129,9 @@ if __name__ == "__main__":
 
         # create list of observations
         list_of_observations = create_obs(person_id, visit, max_occurrences=2, probability_threshold=0.5)
+
+        # create measurements for weight and ideal weight
+        list_of_measurements += create_weight_measurements(person_id, person, visit)
 
         # break
         ### INSERT
