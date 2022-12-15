@@ -21,6 +21,33 @@ GENDER_LIST = {
     concepts.UNKNOWN: "Unknown",
 }
 
+WEIGHT_LIST_MALE = {
+    concepts.WEIGHT: {
+        "name": "Weight",
+        "unit": concepts.UNIT_KG,
+        "sample_func": lambda: np.random.normal(loc = 100, scale = 15),
+    },
+    concepts.IDEAL_BODY_WEIGHT: {
+        "name": "Ideal Body Weight",
+        "unit": concepts.UNIT_KG,
+        "sample_func": lambda: np.random.normal(loc = 80, scale = 5),
+    },
+}
+
+WEIGHT_LIST_FEMALE = {
+    concepts.WEIGHT: {
+        "name": "Weight",
+        "unit": concepts.UNIT_KG,
+        "sample_func": lambda: np.random.normal(loc = 80, scale = 15),
+    },
+    concepts.IDEAL_BODY_WEIGHT: {
+        "name": "Ideal Body Weight",
+        "unit": concepts.UNIT_KG,
+        "sample_func": lambda: np.random.normal(loc = 60, scale = 5),
+    },
+}
+
+
 # regarding diagnoses and treatment
 VENTILATION_BIN = {
     concepts.ARTIFICIAL_RESPIRATION: "Artificial respiration",
@@ -65,7 +92,7 @@ LABORATORY_LIST = {
 
 VENTILATION_LIST = {
     concepts.INHALED_OXYGEN_CONCENTRATION: "Inhaled oxygen concentration",
-    concepts.TIDAL_VOLUME: "Tidal volume.spontaneous+mechanical/Body weight [Volume/mass] --on ventilator",
+    concepts.TIDAL_VOLUME: "Tidal volume Ventilator --on ventilator",
     concepts.PRESSURE_MAX: "Pressure max Respiratory system airway --during inspiration",
     concepts.PEEP: "PEEP Respiratory system --on ventilator",
 }
@@ -91,7 +118,7 @@ VENTILATION_PARAMS = {
             "unit": concepts.UNIT_PERCENT,
             "value": np.arange(0.2, 1.0, 0.05),
         },
-        concepts.TIDAL_VOLUME: {"unit": concepts.UNIT_ML_PER_KG, "value": range(1, 12)},
+        concepts.TIDAL_VOLUME: {"unit": concepts.UNIT_ML_PER_KG, "value": range(200, 1200)},
         concepts.PRESSURE_MAX: {"unit": concepts.UNIT_CM_H2O, "value": range(12, 40)},
         concepts.PEEP: {"unit": concepts.UNIT_CM_H2O, "value": range(12, 40)},
     },
