@@ -118,7 +118,7 @@ VENTILATION_PARAMS = {
             "unit": concepts.UNIT_PERCENT,
             "value": np.arange(0.2, 1.0, 0.05),
         },
-        concepts.TIDAL_VOLUME: {"unit": concepts.UNIT_ML_PER_KG, "value": range(200, 1200)},
+        concepts.TIDAL_VOLUME: {"unit": concepts.UNIT_ML, "value": range(200, 1200)},
         concepts.PRESSURE_MAX: {"unit": concepts.UNIT_CM_H2O, "value": range(12, 40)},
         concepts.PEEP: {"unit": concepts.UNIT_CM_H2O, "value": range(12, 40)},
     },
