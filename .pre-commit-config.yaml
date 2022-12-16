@@ -32,6 +32,7 @@ repos:
     -   id: pydocstyle
         exclude: tests/
         args: [--select, "D101,D102,D103,D105,D106"]
+        additional_dependencies: [toml]
 -   repo: https://github.com/PyCQA/bandit
     rev: '1.7.4'
     hooks:

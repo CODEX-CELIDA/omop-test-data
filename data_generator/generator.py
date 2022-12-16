@@ -1,20 +1,23 @@
 import datetime
 import random
-from typing import List, Optional, cast, Final
+from typing import List, Optional, cast
+
 import numpy as np
 
-pass
-
 from data_generator import parameter as params
+from data_generator.parameter import COND_WEIGHTS, OBS_WEIGHTS
 from omop import concepts
-from omop.tables import DrugExposure, Measurement, ProcedureOccurrence, VisitOccurrence, ConditionOccurrence, Observation, Person
-
+from omop.tables import (
+    ConditionOccurrence,
+    DrugExposure,
+    Measurement,
+    Observation,
+    Person,
+    ProcedureOccurrence,
+    VisitOccurrence,
+)
 
 SECONDS_PER_DAY = 86400
-
-COND_WEIGHTS : Final = [0.3, 0.1, 0.05, 0.15, 0.15, 0.25]
-OBS_WEIGHTS : Final = [0.7, 0.3]
-
 
 
 def create_drug_exp2(
@@ -227,6 +230,7 @@ def create_vent_params_measurements(
                         person_id=person_id,
                         measurement_concept_id=measurement_concept_id,
                         measurement_date=measurement_date,
+                        measurement_datetime=measurement_datetime,
                         value_as_number=value_as_number,
                         unit_concept_id=unit_concept_id,
                     )
@@ -295,6 +299,7 @@ def create_lab_values_measurements(
                         person_id=person_id,
                         measurement_concept_id=measurement_concept_id,
                         measurement_date=measurement_date,
+                        measurement_datetime=measurement_datetime,
                         value_as_number=round(value_as_number, 0),
                         unit_concept_id=unit_concept_id,
                         measurement_type_concept_id=measurement_type_concept_id,
@@ -365,14 +370,12 @@ def create_prone_positioning_procedure(
             )
             procedure_date = procedure_datetime.date()
 
-            # print("back_duration:", back_duration)
-
     return list_of_procedures
 
 
 def create_cond(
     person_id: int, visit: VisitOccurrence, max_occurrences: int = 4
-    ) -> List[ConditionOccurrence]:
+) -> List[ConditionOccurrence]:
     """
     create conditions from list 'conditions' (default: max_occurrences = up to four)
 
@@ -380,102 +383,98 @@ def create_cond(
     COVID-19, Venous Thrombosis, Heparin-induced thrombocytopenia with thrombosis, Allergy to heparin, Allergy to heparinoid, Thrombocytopenic disorder, Pulmonary embolism, Acute respiratory distress syndrome
     """
     list_of_conditions = []
-    r = random.randint(1, (max_occurrences))
-    diagnoses = np.random.choice(list(params.CONDITION_LIST), r, replace = False, p = COND_WEIGHTS)
+    r = random.randint(1, max_occurrences)
+    diagnoses = np.random.choice(
+        list(params.CONDITION_LIST), r, replace=False, p=COND_WEIGHTS
+    )
     for diagnosis in diagnoses:
         condition_start_date = visit.visit_start_date
-        condition_start_datetime = datetime.datetime.combine(visit.visit_start_date, datetime.datetime.min.time())
+        condition_start_datetime = datetime.datetime.combine(
+            visit.visit_start_date, datetime.datetime.min.time()
+        )
         condition_concept_id = diagnosis
         condition_end_date = condition_start_date
         condition_end_datetime = condition_start_datetime
         list_of_conditions.append(
-			ConditionOccurrence(
-				person_id = person_id,
-				condition_concept_id = condition_concept_id,
-                condition_start_date = condition_start_date,
-                condition_start_datetime = condition_start_datetime,
-                condition_end_date = condition_end_date,
-                condition_end_datetime = condition_end_datetime
-				)
-			)
+            ConditionOccurrence(
+                person_id=person_id,
+                condition_concept_id=condition_concept_id,
+                condition_start_date=condition_start_date,
+                condition_start_datetime=condition_start_datetime,
+                condition_end_date=condition_end_date,
+                condition_end_datetime=condition_end_datetime,
+            )
+        )
     return list_of_conditions
 
 
 def create_obs(
-    person_id:int, visit: VisitOccurrence, max_occurrences: int = 2, probability_threshold: int = 0.05
-    ) -> List[Observation]:
+    person_id: int,
+    visit: VisitOccurrence,
+    max_occurrences: int = 2,
+    probability_threshold: float = 0.05,
+) -> List[Observation]:
     """
     with a probability_threshold (default = 0.05), create entries concerning observation(s) from the list 'obs_list' (default: max_occurrences = up to two)
 
     Use observation_concept_ids and weights for weighted random sampling. Taking multiple random samples without replacement requires np.random.choice
-    
+
     """
 
     list_of_observations = []
     ran = random.random()
     if ran > 1 - probability_threshold:
-        r = random.randint(1, (max_occurrences))
-        observations = np.random.choice(list(params.OBSERVATION_LIST), r, replace = False, p = OBS_WEIGHTS)
+        r = random.randint(1, max_occurrences)
+        observations = np.random.choice(
+            list(params.OBSERVATION_LIST), r, replace=False, p=OBS_WEIGHTS
+        )
         for observation in observations:
             observation_concept_id = observation
             observation_date = visit.visit_start_date
-            observation_datetime = datetime.datetime.combine(visit.visit_start_date, datetime.datetime.min.time())   
+            observation_datetime = datetime.datetime.combine(
+                visit.visit_start_date, datetime.datetime.min.time()
+            )
             list_of_observations.append(
                 Observation(
-                    person_id = person_id,
-                    observation_concept_id = observation_concept_id,
-                    observation_date = observation_date,
-                    observation_datetime = observation_datetime
-                    )
+                    person_id=person_id,
+                    observation_concept_id=observation_concept_id,
+                    observation_date=observation_date,
+                    observation_datetime=observation_datetime,
                 )
+            )
     return list_of_observations
 
 
 def create_weight_measurements(
-    person_id: int, person:Person, visit: VisitOccurrence
+    person_id: int, person: Person, visit: VisitOccurrence
 ) -> List[Measurement]:
     """
     Create Measurements for weight and ideal weight
-
     """
-    
+
     list_of_measurements = []
-    
-    # Male
-    if person.gender_concept_id == concepts.GENDER_MALE:
-        for parameter in list(params.WEIGHT_LIST_MALE):
-            data = params.WEIGHT_LIST_MALE[parameter]
-            measurement_concept_id = parameter
-            measurement_date = visit.visit_start_date
-            value_as_number = data["sample_func"]()
-            unit_concept_id = data["unit"])
 
-            list_of_measurements.append(
-                Measurement(
-                    person_id=person_id,
-                    measurement_concept_id=measurement_concept_id,
-                    measurement_date=measurement_date,
-                    value_as_number=value_as_number,
-                    unit_concept_id=unit_concept_id,
-                )
+    assert person.gender_concept_id is not None
+    param_set = params.WEIGHT[person.gender_concept_id]
+
+    for parameter, data in param_set.items():
+        measurement_concept_id = parameter
+        measurement_date = visit.visit_start_date
+        measurement_datetime = datetime.datetime.combine(
+            visit.visit_start_date, datetime.datetime.min.time()
+        ) + datetime.timedelta(seconds=random.randint(0, 86400))
+        value_as_number = data["sample_func"]()
+        unit_concept_id = data["unit"]
+
+        list_of_measurements.append(
+            Measurement(
+                person_id=person_id,
+                measurement_concept_id=measurement_concept_id,
+                measurement_date=measurement_date,
+                measurement_datetime=measurement_datetime,
+                value_as_number=value_as_number,
+                unit_concept_id=unit_concept_id,
             )
-
-    # Female
-    elif person.gender_concept_id == concepts.GENDER_FEMALE:
-        for parameter in list(params.WEIGHT_LIST_FEMALE):
-            data = params.WEIGHT_LIST_FEMALE[parameter]
-            measurement_concept_id = parameter
-            measurement_date = visit.visit_start_date
-            value_as_number = data["sample_func"]()
-            unit_concept_id = data["unit"]
-            list_of_measurements.append(
-                Measurement(
-                    person_id=person_id,
-                    measurement_concept_id=measurement_concept_id,
-                    measurement_date=measurement_date,
-                    value_as_number=value_as_number,
-                    unit_concept_id=unit_concept_id,
-                )
-            )        
+        )
 
     return list_of_measurements

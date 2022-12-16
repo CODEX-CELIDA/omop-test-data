@@ -72,14 +72,14 @@ if __name__ == "__main__":
 
     # MUST be imported AFTER setting the seed!
     from data_generator.generator import (
+        create_cond,
         create_drug_exp2,
         create_lab_values_measurements,
+        create_obs,
         create_prone_positioning_procedure,
         create_vent_params_measurements,
         create_vent_params_procedure,
-        create_cond,
-        create_obs,
-        create_weight_measurements
+        create_weight_measurements,
     )
     from omop.tables import Person, VisitOccurrence
 
@@ -128,7 +128,9 @@ if __name__ == "__main__":
         list_of_conditions = create_cond(person_id, visit, max_occurrences=4)
 
         # create list of observations
-        list_of_observations = create_obs(person_id, visit, max_occurrences=2, probability_threshold=0.5)
+        list_of_observations = create_obs(
+            person_id, visit, max_occurrences=2, probability_threshold=0.5
+        )
 
         # create measurements for weight and ideal weight
         list_of_measurements += create_weight_measurements(person_id, person, visit)
@@ -174,12 +176,18 @@ if __name__ == "__main__":
         for c in list_of_conditions:
             insert("condition_occurrence", asdict(c))
         con.commit()
-        print("- Inserted condition_occurrence data with ", len(list_of_conditions), " entries")
+        print(
+            "- Inserted condition_occurrence data with ",
+            len(list_of_conditions),
+            " entries",
+        )
 
         # insert list of observations
         for o in list_of_observations:
             insert("observation", asdict(o))
         con.commit()
-        print("- Inserted observation data with ", len(list_of_observations), " entries")
+        print(
+            "- Inserted observation data with ", len(list_of_observations), " entries"
+        )
 
     con.close()

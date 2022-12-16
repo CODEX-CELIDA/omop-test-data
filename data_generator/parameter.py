@@ -1,7 +1,8 @@
 """
-OMOP Vocabulary Concepts
+Parameter configuration for data generation.
 """
 import datetime
+from typing import Callable, Final, TypedDict
 
 import numpy as np
 
@@ -10,43 +11,56 @@ from omop import concepts
 BIRTHYEAR_RANGE = range(1920, 2003)
 
 # regarding visits, creating a list of all dates from 2020 and 2021
-VISIT_START_DATE = datetime.date(2020, 1, 1)
-VISIT_END_DATE = datetime.date(2021, 12, 31)
+VISIT_START_DATE = datetime.datetime.today() - datetime.timedelta(
+    days=7
+)  # datetime.date(2020, 1, 1)
+VISIT_END_DATE = datetime.datetime.today()  # datetime.date(2021, 12, 31)
 
 
 # regarding person
 GENDER_LIST = {
     concepts.GENDER_FEMALE: "Female",
     concepts.GENDER_MALE: "Male",
-    concepts.UNKNOWN: "Unknown",
 }
 
-WEIGHT_LIST_MALE = {
-    concepts.WEIGHT: {
-        "name": "Weight",
-        "unit": concepts.UNIT_KG,
-        "sample_func": lambda: np.random.normal(loc = 100, scale = 15),
+
+class ParameterGenerator(TypedDict):
+    """
+    Helper class for type hinting a dictionary that contains
+    name, unit and a function to generate a random value.
+    """
+
+    name: str
+    unit: int
+    sample_func: Callable
+
+
+WEIGHT: dict[int, dict[int, ParameterGenerator]] = {
+    concepts.GENDER_MALE: {
+        concepts.WEIGHT: {
+            "name": "Weight",
+            "unit": concepts.UNIT_KG,
+            "sample_func": lambda: np.random.normal(loc=100, scale=15),
+        },
+        concepts.IDEAL_BODY_WEIGHT: {
+            "name": "Ideal Body Weight",
+            "unit": concepts.UNIT_KG,
+            "sample_func": lambda: np.random.normal(loc=80, scale=5),
+        },
     },
-    concepts.IDEAL_BODY_WEIGHT: {
-        "name": "Ideal Body Weight",
-        "unit": concepts.UNIT_KG,
-        "sample_func": lambda: np.random.normal(loc = 80, scale = 5),
+    concepts.GENDER_FEMALE: {
+        concepts.WEIGHT: {
+            "name": "Weight",
+            "unit": concepts.UNIT_KG,
+            "sample_func": lambda: np.random.normal(loc=80, scale=15),
+        },
+        concepts.IDEAL_BODY_WEIGHT: {
+            "name": "Ideal Body Weight",
+            "unit": concepts.UNIT_KG,
+            "sample_func": lambda: np.random.normal(loc=60, scale=5),
+        },
     },
 }
-
-WEIGHT_LIST_FEMALE = {
-    concepts.WEIGHT: {
-        "name": "Weight",
-        "unit": concepts.UNIT_KG,
-        "sample_func": lambda: np.random.normal(loc = 80, scale = 15),
-    },
-    concepts.IDEAL_BODY_WEIGHT: {
-        "name": "Ideal Body Weight",
-        "unit": concepts.UNIT_KG,
-        "sample_func": lambda: np.random.normal(loc = 60, scale = 5),
-    },
-}
-
 
 # regarding diagnoses and treatment
 VENTILATION_BIN = {
@@ -129,3 +143,5 @@ VENTILATION_PARAMS = {
         }
     },
 }
+COND_WEIGHTS: Final = [0.3, 0.1, 0.05, 0.15, 0.15, 0.25]
+OBS_WEIGHTS: Final = [0.7, 0.3]

@@ -129,6 +129,7 @@ class Measurement:
     person_id: int
     measurement_concept_id: int
     measurement_date: datetime.date
+    measurement_datetime: datetime.datetime
     value_as_number: float
     unit_concept_id: int
     measurement_type_concept_id: Optional[int] = None
@@ -140,7 +141,6 @@ class Measurement:
         self.measurement_type_concept_id = concepts.EHR
 
 
-
 @dataclass
 class ConditionOccurrence:
     """
@@ -148,7 +148,6 @@ class ConditionOccurrence:
     """
 
     person_id: int
-    condition_concept_id: int
     condition_concept_id: int
     condition_start_date: datetime.date
     condition_start_datetime: datetime.datetime
@@ -161,7 +160,6 @@ class ConditionOccurrence:
         Set condition_type_concept_id to EHR
         """
         self.condition_type_concept_id = concepts.EHR
-
 
 
 @dataclass
