@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import random
 from dataclasses import asdict
 from typing import Any, Dict
@@ -47,6 +48,12 @@ def connect_db() -> psycopg2.extensions.connection:
 
 
 if __name__ == "__main__":
+
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+    )
+
     parser = argparse.ArgumentParser(
         description="Generate OMOP test data for CODEX+ CELIDA",
         formatter_class=argparse.RawTextHelpFormatter,
@@ -124,7 +131,7 @@ if __name__ == "__main__":
             person_id, visit, max_occurrences=5
         )
 
-        # create list of condition_occurences
+        # create list of condition_occurrences
         list_of_conditions = create_cond(person_id, visit, max_occurrences=4)
 
         # create list of observations
@@ -135,59 +142,47 @@ if __name__ == "__main__":
         # create measurements for weight and ideal weight
         list_of_measurements += create_weight_measurements(person_id, person, visit)
 
-        # break
-        ### INSERT
-        print("Loading data into database")
+        logging.info("Inserting data into database")
 
         insert("person", asdict(person))
-        con.commit()
-        print("- Inserted patient data")
+        logging.info("- Inserted patient data")
 
         # insert visit
         insert("visit_occurrence", asdict(visit))
-        con.commit()
-        print("- Inserted visit data")
+        logging.info("- Inserted visit data")
 
         # insert list of drugs
         for d in list_of_drugs:
             insert("drug_exposure", asdict(d))
-        con.commit()
-        print("- Inserted drug exposure data with ", len(list_of_drugs), " entries")
+        logging.info(f"Inserted drug exposure data with {len(list_of_drugs)} entries")
 
         # insert procedure
         for prod in list_of_procedures:
             insert("procedure_occurrence", asdict(prod))
-        con.commit()
-        print(
-            "- Inserted procedure occurrence data with ",
-            len(list_of_procedures),
-            " entries",
+        logging.info(
+            f"Inserted procedure occurrence data with {len(list_of_procedures)} entries",
         )
 
         # insert list of measurements
         for m in list_of_measurements:
             insert("measurement", asdict(m))
-        con.commit()
-        print(
-            "- Inserted measurement data with ", len(list_of_measurements), " entries"
+        logging.info(
+            f"Inserted measurement data with {len(list_of_measurements)} entries"
         )
 
         # insert list of conditions
         for c in list_of_conditions:
             insert("condition_occurrence", asdict(c))
-        con.commit()
-        print(
-            "- Inserted condition_occurrence data with ",
-            len(list_of_conditions),
-            " entries",
+        logging.info(
+            f"Inserted condition_occurrence data with {len(list_of_conditions)} entries"
         )
 
         # insert list of observations
         for o in list_of_observations:
             insert("observation", asdict(o))
-        con.commit()
-        print(
-            "- Inserted observation data with ", len(list_of_observations), " entries"
+        logging.info(
+            f"Inserted observation data with {len(list_of_observations)} entries"
         )
 
+    con.commit()
     con.close()
