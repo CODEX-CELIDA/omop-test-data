@@ -15,6 +15,7 @@ from omop.tables import (
     Person,
     ProcedureOccurrence,
     VisitOccurrence,
+    random_datetime,
 )
 
 SECONDS_PER_DAY = 86400
@@ -158,13 +159,9 @@ def create_vent_params_procedure(
     )
     end_vent = begin_vent + (random.random() * (visit.visit_end_date - begin_vent))
     procedure_date = begin_vent
-    procedure_datetime = datetime.datetime.combine(
-        procedure_date, datetime.datetime.min.time()
-    )
+    procedure_datetime = random_datetime(procedure_date)
     procedure_end_date = end_vent
-    procedure_end_datetime = datetime.datetime.combine(
-        procedure_end_date, datetime.datetime.min.time()
-    )
+    procedure_end_datetime = random_datetime(procedure_end_date)
 
     return ProcedureOccurrence(
         person_id=person_id,
@@ -206,9 +203,7 @@ def create_vent_params_measurements(
     end_vent = begin_vent + (random.random() * (visit.visit_end_date - begin_vent))
     duration_vent = (end_vent - begin_vent).total_seconds() / SECONDS_PER_DAY
     for x in range(int(duration_vent)):
-        base_datetime = datetime.datetime.combine(
-            begin_vent, datetime.datetime.min.time()
-        )
+        base_datetime = random_datetime(begin_vent)
         begin_vent += datetime.timedelta(days=1)
         # create FiO2 values
         measurement_datetime = base_datetime  # set measurement_datetime to base
@@ -257,9 +252,7 @@ def create_lab_values_measurements(
 
     # set "basetime" to visit_start, i.e. generation of lab values are started up to
     # twelve hours after the start of the visit
-    measurement_datetime = datetime.datetime.combine(
-        visit.visit_start_date, datetime.datetime.min.time()
-    ) + datetime.timedelta(hours=random.choice(range(12)))
+    measurement_datetime = random_datetime(visit.visit_start_date, max_hours=12)
     measurement_date = measurement_datetime.date()
 
     visit_duration = visit.visit_end_date - visit.visit_start_date
@@ -332,9 +325,7 @@ def create_prone_positioning_procedure(
         procedure_end_date: datetime.date = procedure_date + (
             random.random() * (visit.visit_end_date - procedure_date)
         )
-        procedure_datetime = datetime.datetime.combine(
-            procedure_date, datetime.time()
-        ) + datetime.timedelta(seconds=random.randint(0, 86400))
+        procedure_datetime = random_datetime(procedure_date)
         procedure_end_datetime = procedure_datetime + datetime.timedelta(
             seconds=random.randint(0, 86400)
         )
@@ -389,9 +380,7 @@ def create_cond(
     )
     for diagnosis in diagnoses:
         condition_start_date = visit.visit_start_date
-        condition_start_datetime = datetime.datetime.combine(
-            visit.visit_start_date, datetime.datetime.min.time()
-        )
+        condition_start_datetime = random_datetime(visit.visit_start_date)
         condition_concept_id = diagnosis
         condition_end_date = condition_start_date
         condition_end_datetime = condition_start_datetime
@@ -431,9 +420,7 @@ def create_obs(
         for observation in observations:
             observation_concept_id = observation
             observation_date = visit.visit_start_date
-            observation_datetime = datetime.datetime.combine(
-                visit.visit_start_date, datetime.datetime.min.time()
-            )
+            observation_datetime = random_datetime(visit.visit_start_date)
             list_of_observations.append(
                 Observation(
                     person_id=person_id,
@@ -460,9 +447,7 @@ def create_weight_measurements(
     for parameter, data in param_set.items():
         measurement_concept_id = parameter
         measurement_date = visit.visit_start_date
-        measurement_datetime = datetime.datetime.combine(
-            visit.visit_start_date, datetime.datetime.min.time()
-        ) + datetime.timedelta(seconds=random.randint(0, 86400))
+        measurement_datetime = random_datetime(visit.visit_start_date)
         value_as_number = data["sample_func"]()
         unit_concept_id = data["unit"]
 

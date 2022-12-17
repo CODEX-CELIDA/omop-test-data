@@ -30,13 +30,10 @@ def random_date(start_date: datetime.date, end_date: datetime.date) -> datetime.
     )
 
 
-def random_datetime(date: datetime.date) -> datetime.datetime:
+def random_datetime(date: datetime.date, max_hours: int = 24) -> datetime.datetime:
     """Generate a random datetime between `date` and `date` + 1 day"""
-    return datetime.datetime.combine(
-        date,
-        datetime.time(
-            random.randint(0, 23), random.randint(0, 59), random.randint(0, 59)
-        ),
+    return datetime.datetime.combine(date, datetime.time()) + datetime.timedelta(
+        seconds=random.randint(0, max_hours * 3600)
     )
 
 
