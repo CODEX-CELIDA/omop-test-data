@@ -5,18 +5,38 @@ This module contains the data classes used in the OMOP CDM.
 """
 import datetime
 import random
-from typing import Optional
+
+pass
 
 from pydantic.dataclasses import dataclass
 
 from data_generator import parameter as params
 from omop import concepts
 
+# DUMMY_* values are used as default values for the data classes,
+# in order to use required fields without having to provide a value.
+# The value will then be set in the __post_init__ function of the
+# respective data class.
+DUMMY_DATE = datetime.date(1900, 1, 1)
+DUMMY_DATETIME = datetime.datetime(1900, 1, 1, 0, 0, 0)
+DUMMY_INT = -1
+DUMMY_CONCEPT_ID = concepts.UNKNOWN
+
 
 def random_date(start_date: datetime.date, end_date: datetime.date) -> datetime.date:
     """Generate a random datetime between `start_date` and `end_date`"""
     return start_date + datetime.timedelta(
         days=random.randint(0, (end_date - start_date).days),
+    )
+
+
+def random_datetime(date: datetime.date) -> datetime.datetime:
+    """Generate a random datetime between `date` and `date` + 1 day"""
+    return datetime.datetime.combine(
+        date,
+        datetime.time(
+            random.randint(0, 23), random.randint(0, 59), random.randint(0, 59)
+        ),
     )
 
 
@@ -27,12 +47,13 @@ class Person:
     """
 
     person_id: int
-    gender_concept_id: Optional[int] = None
-    year_of_birth: Optional[int] = None
-    month_of_birth: Optional[int] = None
-    day_of_birth: Optional[int] = None
-    race_concept_id: Optional[int] = None
-    ethnicity_concept_id: Optional[int] = None
+    # All further values will be overwritten in __post_init__
+    gender_concept_id: int = DUMMY_CONCEPT_ID
+    year_of_birth: int = DUMMY_INT
+    month_of_birth: int = DUMMY_INT
+    day_of_birth: int = DUMMY_INT
+    race_concept_id: int = DUMMY_CONCEPT_ID
+    ethnicity_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
@@ -58,16 +79,13 @@ class VisitOccurrence:
     """
 
     person_id: int
-    visit_concept_id: int = concepts.UNKNOWN  # Will be overwritten in __post_init__
-    visit_start_date: datetime.date = datetime.date(
-        1900, 1, 1
-    )  # Will be overwritten in __post_init__
-    visit_end_date: datetime.date = datetime.date(
-        1900, 1, 1
-    )  # Will be overwritten in __post_init__
-    visit_type_concept_id: int = (
-        concepts.UNKNOWN
-    )  # Will be overwritten in __post_init__
+    # All following values will be overwritten in __post_init__
+    visit_concept_id: int = DUMMY_CONCEPT_ID
+    visit_start_date: datetime.date = DUMMY_DATE
+    visit_start_datetime: datetime.datetime = DUMMY_DATETIME
+    visit_end_date: datetime.date = DUMMY_DATE
+    visit_end_datetime: datetime.datetime = DUMMY_DATETIME
+    visit_type_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
@@ -77,10 +95,12 @@ class VisitOccurrence:
         self.visit_start_date = random_date(
             start_date=params.VISIT_START_DATE, end_date=params.VISIT_END_DATE
         )
+        self.visit_start_datetime = random_datetime(self.visit_start_date)
         self.visit_end_date = self.visit_start_date + datetime.timedelta(
             days=random.choice(range(3, 60))
         )
-        self.visit_type_concept_id = concepts.EHR
+        self.visit_end_datetime = random_datetime(self.visit_start_date)
+        self.visit_type_concept_id = concepts.VISIT_TYPE_STILL_PATIENT
 
 
 @dataclass
@@ -111,7 +131,7 @@ class DrugExposure:
     drug_exposure_end_date: datetime.date
     drug_exposure_end_datetime: datetime.datetime
     quantity: int
-    drug_type_concept_id: Optional[int] = None
+    drug_type_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
@@ -132,7 +152,7 @@ class Measurement:
     measurement_datetime: datetime.datetime
     value_as_number: float
     unit_concept_id: int
-    measurement_type_concept_id: Optional[int] = None
+    measurement_type_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
@@ -153,7 +173,7 @@ class ConditionOccurrence:
     condition_start_datetime: datetime.datetime
     condition_end_date: datetime.date
     condition_end_datetime: datetime.datetime
-    condition_type_concept_id: Optional[int] = None
+    condition_type_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
@@ -172,7 +192,7 @@ class Observation:
     observation_concept_id: int
     observation_date: datetime.date
     observation_datetime: datetime.datetime
-    observation_type_concept_id: Optional[int] = None
+    observation_type_concept_id: int = DUMMY_CONCEPT_ID
 
     def __post_init__(self) -> None:
         """
