@@ -130,7 +130,7 @@ VENTILATION_PARAMS = {
     concepts.ARTIFICIAL_RESPIRATION: {
         concepts.INHALED_OXYGEN_CONCENTRATION: {
             "unit": concepts.UNIT_PERCENT,
-            "value": np.arange(0.2, 1.0, 0.05),
+            "value": np.arange(20.0, 100.0, 5.0),
         },
         concepts.TIDAL_VOLUME: {"unit": concepts.UNIT_ML, "value": range(200, 1200)},
         concepts.PRESSURE_MAX: {"unit": concepts.UNIT_CM_H2O, "value": range(12, 40)},
@@ -139,7 +139,7 @@ VENTILATION_PARAMS = {
     concepts.OXYGEN_THERAPY: {
         concepts.INHALED_OXYGEN_CONCENTRATION: {
             "unit": concepts.UNIT_PERCENT,
-            "value": np.arange(0.2, 0.5, 0.05),
+            "value": np.arange(20.0, 50.0, 5.0),
         }
     },
 }
