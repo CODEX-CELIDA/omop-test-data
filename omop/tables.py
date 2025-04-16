@@ -44,6 +44,7 @@ class Person:
     """
 
     person_id: int
+    birth_datetime: datetime.datetime = DUMMY_DATETIME
     # All further values will be overwritten in __post_init__
     gender_concept_id: int = DUMMY_CONCEPT_ID
     year_of_birth: int = DUMMY_INT
@@ -57,13 +58,14 @@ class Person:
         Set the default values for the person.
         """
         self.gender_concept_id = random.choice(list(params.GENDER_LIST))
-        date_of_birth = random_date(
+        date = random_date(
             datetime.date(1920, 1, 1), datetime.date(2003, 12, 31)
         )
+        self.birth_datetime = random_datetime(date)
 
-        self.year_of_birth = date_of_birth.year
-        self.month_of_birth = date_of_birth.month
-        self.day_of_birth = date_of_birth.day
+        self.year_of_birth = self.birth_datetime.year
+        self.month_of_birth = self.birth_datetime.month
+        self.day_of_birth = self.birth_datetime.day
 
         self.race_concept_id = concepts.UNKNOWN  # always set to zero / unknown
         self.ethnicity_concept_id = concepts.UNKNOWN  # always set to zero / unknown
